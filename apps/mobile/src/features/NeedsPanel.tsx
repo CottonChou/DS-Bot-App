@@ -1,7 +1,7 @@
 import { tr } from "../i18n";
 import React, { useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
-import { Button, Card, Label, Notice, Section, SettingRow, Tag } from "../components/UI";
+import { Button, Card, EmptyState, Label, Notice, Section, SettingRow, Tag } from "../components/UI";
 import { AnimatedPressable as Pressable } from "../components/Motion";
 import { useTheme } from "../theme";
 import { errorText } from "../types";
@@ -110,9 +110,11 @@ export function NeedsPanel({ client, online }: { client: MobileClient; online: b
 
       <Section title={tr("Waiting for you")}>
         {!data?.items.length ? (
-          <View style={{ padding: 18 }}>
-            <Label muted>{tr("Nothing needs your attention right now.")}</Label>
-          </View>
+          <EmptyState
+            glyph="check"
+            title={tr("Nothing needs your attention right now.")}
+            hint={tr("Memory candidates, skills and tool approvals will show up here.")}
+          />
         ) : (
           <View style={{ padding: 12, gap: 10 }}>
             {data.items.map((item) => (

@@ -15,7 +15,7 @@ import {
   Switch,
 } from "react-native";
 import { AnimatedPressable as Pressable, PageTransition } from "./Motion";
-import { contrastText, useTheme } from "../theme";
+import { contrastText, useTheme, spacing, radius, typography } from "../theme";
 import { BRAND_BLUE } from "../logic/colors";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -31,14 +31,7 @@ export function Label({
 }) {
   const t = useTheme();
   return (
-    <Text
-      style={{
-        color: muted ? t.muted : t.ink,
-        fontSize: large ? 19 : 14,
-        fontWeight: large ? "600" : "400",
-        lineHeight: large ? 26 : 21,
-      }}
-    >
+    <Text style={{ ...typography.body, ...(large ? typography.headline : {}), color: muted ? t.muted : t.ink }}>
       {children}
     </Text>
   );
@@ -73,24 +66,23 @@ export function Button({
       onPress={onPress}
       style={({ pressed }) => ({
         minHeight: 46,
-        paddingVertical: compact ? 8 : 10,
-        paddingHorizontal: compact ? 13 : 18,
-        borderRadius: 14,
+        paddingVertical: compact ? spacing.sm : spacing.md - 2,
+        paddingHorizontal: compact ? spacing.md + 1 : spacing.lg + 2,
+        borderRadius: radius.md,
         alignItems: "center",
         justifyContent: "center",
-        opacity: disabled ? 0.4 : pressed ? 0.65 : 1,
+        transform: [{ scale: pressed && !disabled ? 0.97 : 1 }],
+        opacity: disabled ? 0.4 : 1,
         backgroundColor: secondary ? (floating ? t.surface : "transparent") : danger ? t.error : t.accent,
-        borderColor: secondary ? t.lineStrong : t.line,
+        borderColor: secondary ? t.lineStrong : "transparent",
         borderWidth: secondary || floating ? 1 : 0,
+        shadowColor: t.accent,
+        shadowOpacity: secondary || floating || disabled ? 0 : pressed ? 0.4 : 0.25,
+        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 6 },
       })}
     >
-      <Text
-        style={{
-          fontSize: 15,
-          fontWeight: "600",
-          color: secondary ? (danger ? t.error : t.ink) : danger ? contrastText(t.error) : t.accentText,
-        }}
-      >
+      <Text style={{ ...typography.bodyStrong, color: secondary ? (danger ? t.error : t.ink) : danger ? contrastText(t.error) : t.accentText }}>
         {title}
       </Text>
     </Pressable>
@@ -537,5 +529,111 @@ export function Tag({ children }: { children: React.ReactNode }) {
     >
       {children}
     </Text>
+  );
+}
+
+/** Small rounded status chip. tone maps to semantic roles from the theme. */
+export function Pill({
+  children,
+  tone = "neutral",
+  dot = false,
+}: {
+  children: React.ReactNode;
+  tone?: "neutral" | "accent" | "success" | "warning" | "danger";
+  dot?: boolean;
+}) {
+  const t = useTheme();
+  const toneColor =
+    tone === "accent"
+      ? t.accent
+      : tone === "success"
+        ? t.success
+        : tone === "warning"
+          ? t.warning
+          : tone === "danger"
+            ? t.error
+            : t.textSecondary;
+  return (
+    <View
+      accessibilityRole="text"
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacing.sm,
+        paddingVertical: spacing.sm - 2,
+        paddingHorizontal: spacing.md,
+        borderRadius: radius.pill,
+        backgroundColor: t.surfaceRaised,
+        borderWidth: 1,
+        borderColor: t.line,
+        alignSelf: "flex-start",
+      }}
+    >
+      {dot && (
+        <View
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: 4,
+            backgroundColor: toneColor,
+          }}
+        />
+      )}
+      <Text style={{ ...typography.subheadline, color: t.ink }}>{children}</Text>
+    </View>
+  );
+}
+
+/** Branded empty state: glyph, title, hint and optional action button. */
+export function EmptyState({
+  glyph = "bell",
+  title,
+  hint,
+  actionTitle,
+  onAction,
+}: {
+  glyph?: IconName;
+  title: string;
+  hint?: string;
+  actionTitle?: string;
+  onAction?: () => void;
+}) {
+  const t = useTheme();
+  return (
+    <View
+      style={{
+        alignItems: "center",
+        gap: spacing.md,
+        paddingVertical: spacing.xxl,
+        paddingHorizontal: spacing.lg,
+      }}
+      accessibilityRole="text"
+    >
+      <View
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: 32,
+          backgroundColor: t.accentSoft,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Icon name={glyph} size={28} color={t.accent} />
+      </View>
+      <Text style={{ ...typography.bodyStrong, color: t.ink, textAlign: "center" }}>
+        {title}
+      </Text>
+      {hint ? (
+        <Text style={{ ...typography.caption, color: t.muted, textAlign: "center", maxWidth: 280 }}>
+          {hint}
+        </Text>
+      ) : null}
+      {actionTitle && onAction ? (
+        <View style={{ marginTop: spacing.sm }}>
+          <Button title={actionTitle} onPress={onAction} secondary compact />
+        </View>
+      ) : null}
+    </View>
   );
 }

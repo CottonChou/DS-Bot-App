@@ -57,6 +57,7 @@ const zh: Record<string, string> = {
   "Tools & plugins": "工具与插件",
   "DS Bot tools, plugins and capabilities": "DS Bot 工具、插件与能力",
   "Nothing needs your attention right now.": "现在没有需要你处理的事项。",
+  "Memory candidates, skills and tool approvals will show up here.": "记忆候选、技能和工具审批会显示在这里。",
   "Approved": "已批准",
   "Rejected": "已拒绝",
   "Approve": "批准",

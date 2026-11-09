@@ -45,7 +45,7 @@ import {
   tokenStore,
   writeCache,
 } from "./storage";
-import { setThemePreferences, useTheme } from "./theme";
+import { setThemePreferences, useTheme, typography } from "./theme";
 import { errorText } from "./types";
 import {
   dateLocale,
@@ -469,8 +469,8 @@ function Shell() {
               {needs.total > 0 && !query && <Pressable accessibilityRole="button" accessibilityLabel={tr("Needs you")} onPress={() => navigate({page:"settings",initial:"needs"})} style={({pressed}) => ({flexDirection:"row",alignItems:"center",gap:12,paddingHorizontal:16,paddingVertical:14,marginBottom:14,borderRadius:18,borderWidth:1,borderColor:t.line,backgroundColor:pressed?t.hover:t.surface})}>
                 <View style={{width:34,height:34,borderRadius:17,backgroundColor:t.soft,alignItems:"center",justifyContent:"center"}}><Icon name="bell" size={17} color={t.accent}/></View>
                 <View style={{flex:1,gap:2}}>
-                  <Text style={{color:t.ink,fontSize:16,fontWeight:"600"}}>{tr("Needs you")}</Text>
-                  <Text style={{color:t.muted,fontSize:12}}>{tr("{count} items waiting",{count:needs.total})}</Text>
+                  <Text style={{...typography.bodyStrong,color:t.ink}}>{tr("Needs you")}</Text>
+                  <Text style={{...typography.caption,color:t.muted}}>{tr("{count} items waiting",{count:needs.total})}</Text>
                 </View>
                 <View style={{minWidth:26,height:26,borderRadius:13,paddingHorizontal:8,alignItems:"center",justifyContent:"center",backgroundColor:t.accent}}><Text style={{color:t.accentText,fontSize:12,fontWeight:"700"}}>{needs.total}</Text></View>
                 <Icon name="chevron" size={16} color={t.faint}/>
@@ -482,22 +482,22 @@ function Shell() {
                   const greeting = hour < 12 ? tr("Good morning") : hour < 18 ? tr("Good afternoon") : tr("Good evening");
                   const today = now.toLocaleDateString(dateLocale(), { weekday: "long", month: "long", day: "numeric" });
                   return <>
-                    <Text style={{color:t.muted,fontSize:11,fontWeight:"600",letterSpacing:1.1,textTransform:"uppercase"}}>{today}</Text>
-                    <Text style={{color:t.ink,fontSize:24,fontWeight:"700",letterSpacing:-0.3,marginTop:6}}>{greeting}</Text>
+                    <Text style={{...typography.section,color:t.textSecondary}}>{today}</Text>
+                    <Text style={{...typography.largeTitle,fontSize:24,letterSpacing:-0.3,color:t.ink,marginTop:6}}>{greeting}</Text>
                     <View style={{flexDirection:"row",flexWrap:"wrap",gap:8,marginTop:14}}>
                       <View style={{flexDirection:"row",alignItems:"center",gap:6,borderRadius:999,backgroundColor:t.soft,paddingHorizontal:10,paddingVertical:5}}>
-                        <View style={{width:6,height:6,borderRadius:3,backgroundColor:workspace.online?"#3ecf8e":t.faint}}/>
+                        <View style={{width:6,height:6,borderRadius:3,backgroundColor:workspace.online?t.success:t.faint}}/>
                         <Text style={{color:t.ink,fontSize:12,fontWeight:"500"}}>{workspace.online ? tr("Online") : tr("Offline")}</Text>
                       </View>
                       <View style={{borderRadius:999,backgroundColor:t.hover,paddingHorizontal:10,paddingVertical:5}}>
-                        <Text style={{color:t.muted,fontSize:12,fontWeight:"500"}}>{sorted.length === 1 ? tr("1 conversation") : tr("{count} conversations",{count:sorted.length})}</Text>
+                        <Text style={{color:t.textSecondary,fontSize:12,fontWeight:"500"}}>{sorted.length === 1 ? tr("1 conversation") : tr("{count} conversations",{count:sorted.length})}</Text>
                       </View>
                     </View>
                     <Text pointerEvents="none" style={{position:"absolute",right:-6,bottom:-30,fontSize:104,fontWeight:"800",color:t.accent,opacity:0.12}}>M</Text>
                   </>;
                 })()}
               </View>}
-              {!query && !!sorted.length && <Text style={{color:t.muted,fontSize:11,fontWeight:"700",letterSpacing:1.1,textTransform:"uppercase",marginLeft:4,marginBottom:10}}>{tr("Conversations")}</Text>}
+              {!query && !!sorted.length && <Text style={{...typography.section,color:t.textSecondary,marginLeft:4,marginBottom:10}}>{tr("Conversations")}</Text>}
               {sorted.map(conversationRow)}
               {!sorted.length && <View style={{padding:24,gap:16}}><Label muted>{tr("No conversations found.")}</Label>{classic ? <Button title={tr("New DSH Agent")} disabled={creating || !workspace.online} onPress={addAgent}/> : <Button secondary title={tr("Reconnect")} onPress={workspace.refresh}/>}</View>}
             </ScrollView>

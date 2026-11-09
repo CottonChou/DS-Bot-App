@@ -183,7 +183,63 @@ export function useTheme() {
     tagBg: alpha(ink, dark ? 0.09 : 0.06),
     tagInk: alpha(ink, 0.58),
     error: dark ? "#ff7078" : "#c93942",
+    // extended semantic roles (three-tier token model)
+    success: dark ? "#5ed19c" : "#1e9e67",
+    warning: dark ? "#f5c065" : "#b97a12",
+    dangerSoft: alpha(dark ? "#ff7078" : "#c93942", 0.12),
+    successSoft: alpha(dark ? "#5ed19c" : "#1e9e67", 0.12),
+    warningSoft: alpha(dark ? "#f5c065" : "#b97a12", 0.14),
+    accentSoft: alpha(accent, 0.12),
+    accentStrong: accent,
+    surfaceSunken: dark ? "#08080c" : alpha(ink, 0.05),
+    surfaceHero: dark ? alpha(accent, 0.16) : alpha(accent, 0.08),
+    surfaceRaised: dark ? "#1e1e2a" : "#ffffff",
+    textSecondary: alpha(ink, 0.72),
+    textTertiary: alpha(ink, 0.45),
+    online: dark ? "#41d98d" : "#18b26a",
     motion: typeof prefs.motion === "string" ? prefs.motion : "normal",
   };
 }
 export type Theme = ReturnType<typeof useTheme>;
+
+/**
+ * Design tokens — spacing and typography scales are theme-independent
+ * (best practice: only colors swap between light/dark; layout rhythm never does).
+ * Three-tier model: primitives (here) → semantic roles (useTheme) → components.
+ */
+export const spacing = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
+  xxl: 32,
+} as const;
+
+export const radius = {
+  sm: 10,
+  md: 14,
+  lg: 20,
+  sheet: 26,
+  pill: 999,
+} as const;
+
+export const typography = {
+  largeTitle: { fontSize: 30, fontWeight: "700" as const, lineHeight: 36 },
+  title: { fontSize: 22, fontWeight: "700" as const, lineHeight: 27 },
+  headline: { fontSize: 17, fontWeight: "600" as const, lineHeight: 22 },
+  body: { fontSize: 16, fontWeight: "400" as const, lineHeight: 21 },
+  bodyStrong: { fontSize: 16, fontWeight: "600" as const, lineHeight: 21 },
+  subheadline: { fontSize: 14, fontWeight: "500" as const, lineHeight: 19 },
+  caption: { fontSize: 13, fontWeight: "400" as const, lineHeight: 17 },
+  section: {
+    fontSize: 11,
+    fontWeight: "700" as const,
+    lineHeight: 14,
+    letterSpacing: 1.4,
+    textTransform: "uppercase" as const,
+  },
+} as const;
+
+export type SpacingToken = keyof typeof spacing;
+export type RadiusToken = keyof typeof radius;

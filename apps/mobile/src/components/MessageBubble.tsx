@@ -166,8 +166,8 @@ export function MessageBubble({ message, client, conversationId, serverId, bot, 
       {thinking ? <View style={{ borderLeftWidth: 2, borderColor: t.line, paddingLeft: 10 }}><Text selectable style={{ color: t.muted, fontSize: 13, lineHeight: 20 }}>{message.reasoning}</Text></View> : null}
     </View> : null}
     {!!message.text || !!message.attachments?.length || (message.pending && !message.reasoning) ? <View style={{ flexDirection: mine ? "row-reverse" : "row", alignItems: "flex-end", gap: 8, justifyContent: "flex-start" }}>
-      <Pressable accessible={false} onLongPress={() => !message.pending && openActions()} delayLongPress={350} style={{ maxWidth: mine ? "90%" : "88%", flexShrink: 1, backgroundColor: mine ? t.messageBubble : t.bubble, borderRadius: 26, paddingHorizontal: 18, paddingVertical: 13, gap: 10 }}>
-        {!!message.text ? <MarkdownText onLongPress={!message.pending ? () => openActions() : undefined} fontSize={18} text={message.text} bots={bots} selfId={mine ? undefined : bot?.id} color={mine ? t.messageText : t.ink} onLink={url => {
+      <Pressable accessible={false} onLongPress={() => !message.pending && openActions()} delayLongPress={350} style={{ maxWidth: mine ? "90%" : "88%", flexShrink: 1, backgroundColor: mine ? t.user : t.bubble, borderRadius: 18, paddingHorizontal: 15, paddingVertical: 12, gap: 10 }}>
+        {!!message.text ? <MarkdownText onLongPress={!message.pending ? () => openActions() : undefined} fontSize={16} text={message.text} bots={bots} selfId={mine ? undefined : bot?.id} color={mine ? t.userText : t.ink} onLink={url => {
           if (!url.startsWith("https://bots.local/")) return false;
           try { const id = decodeURIComponent(url.slice("https://bots.local/".length)); if (bots?.some(item => item.id === id)) onOpenBot?.(id); } catch {}
           return true;

@@ -48,6 +48,7 @@ import {
 import { setThemePreferences, useTheme } from "./theme";
 import { errorText } from "./types";
 import {
+  dateLocale,
   LocalePreference,
   setHostLocale,
   setLocalePreference,
@@ -94,6 +95,7 @@ function Shell() {
   const [homeScroll,setHomeScroll] = useState(0);
   const [previewState, setPreviewState] = useState<{serverId:string;items:Record<string,Message>} | null>(null);
   const previews = previewState?.serverId === host?.serverId ? previewState?.items || {} : {};
+  const [needs, setNeeds] = useState({ total: 0, memory: 0, skills: 0, approvals: 0 });
   const [creating, setCreating] = useState(false);
   const workspace = useWorkspace(client, host);
   useEffect(() => {
@@ -302,6 +304,18 @@ function Shell() {
     });
   const conversationActivity = JSON.stringify(workspace.conversations.map(item => [item.id, item.sessionId, item.updatedAt]));
   useEffect(() => {
+    if (route.page !== "home" || !client || !workspace.online) return;
+    let alive = true;
+    const load = () => {
+      void client.action<{ counts: { total: number; memory: number; skills: number; approvals: number } }>("needs-list")
+        .then(result => { if (alive && result?.counts) setNeeds(result.counts); })
+        .catch(() => {});
+    };
+    load();
+    const timer = setInterval(load, 30000);
+    return () => { alive = false; clearInterval(timer); };
+  }, [route.page, client, workspace.online, conversationActivity]);
+  useEffect(() => {
     if (route.page !== "home" || !host) return;
     let alive = true;
     const controller = new AbortController();
@@ -359,18 +373,21 @@ function Shell() {
         style={({ pressed }) => ({
           flexDirection: "row",
           alignItems: "center",
-          gap: 18,
-          paddingHorizontal: 8,
-          paddingVertical: 24,
-          minHeight: 92,
-          borderRadius: 22,
-          backgroundColor: pressed ? t.hover : undefined,
+          gap: 14,
+          paddingHorizontal: 14,
+          paddingVertical: 14,
+          minHeight: 78,
+          marginBottom: 10,
+          borderRadius: 18,
+          borderWidth: 1,
+          borderColor: t.line,
+          backgroundColor: pressed ? t.hover : t.surface,
         })}
       >
         {bot ? (
-          <BotAvatar bot={bot} size={50} main={main} live={!!item.waiting} />
+          <BotAvatar bot={bot} size={46} main={main} live={!!item.waiting} />
         ) : room ? (
-          <RoomAvatar room={room} team={workspace.team} size={50} />
+          <RoomAvatar room={room} team={workspace.team} size={46} />
         ) : (
           <View style={{ width: 50, alignItems: "center" }}>
             <Icon name="bots" color={t.muted} />
@@ -382,19 +399,19 @@ function Shell() {
             style={{
               color: t.ink,
               fontWeight: "600",
-              fontSize: 20,
+              fontSize: 17,
             }}
           >
             {item.name || tr("New conversation")}
             {needsApproval ? " · " + tr("Waiting for approval") : ""}
           </Text>
-          <Text numberOfLines={1} style={{fontSize:17,lineHeight:24,color:t.muted}}>
+          <Text numberOfLines={1} style={{fontSize:14,lineHeight:20,color:t.muted}}>
             {workPreview || previews[item.id]?.text.replace(/\s+/g," ").trim() || (previews[item.id]?.attachments?.length ? tr("Attachment message") : "") || (typeof item.preview === "string" && item.preview) ||
               (item.waiting ? tr("Waiting for your answer") : bot?.role || (room ? room.members.map(id => workspace.team.bots.find(b => b.id === id)?.name || id).join(" · ") : tr("DSH Agent")))}
           </Text>
         </View>
         <View style={{alignItems:"flex-end",alignSelf:"stretch",justifyContent:"space-between",paddingVertical:4,gap:10}}>
-          {!!lastActivity && <Text style={{fontSize:14,color:t.muted}}>{new Date(lastActivity).toLocaleDateString() === new Date().toLocaleDateString()
+          {!!lastActivity && <Text style={{fontSize:12,color:t.muted}}>{new Date(lastActivity).toLocaleDateString() === new Date().toLocaleDateString()
             ? new Date(lastActivity).toLocaleTimeString(locale === "zh" ? "zh-CN" : "en-US",{hour:"2-digit",minute:"2-digit"})
             : new Date(lastActivity).toLocaleDateString(locale === "zh" ? "zh-CN" : "en-US",{month:"short",day:"numeric"})}</Text>}
           {notificationInbox?.items.some(event => !event.read && (event.conversationId === item.id || item.id === `bot:${event.conversationId}` || item.id === `room:${event.conversationId}`))
@@ -432,8 +449,16 @@ function Shell() {
         ) : route.page === "home" ? (
           <View style={{flex:1}}>
             <View pointerEvents="box-none" style={{position:"absolute",top:0,left:0,right:0,zIndex:2,flexDirection:"row",alignItems:"center",paddingHorizontal:20,paddingTop:16,paddingBottom:12,gap:10}}>
+              <View style={{flex:1,flexDirection:"row",alignItems:"center",gap:11}}>
+                <View style={{width:34,height:34,borderRadius:17,backgroundColor:t.accent,alignItems:"center",justifyContent:"center"}}>
+                  <Text style={{color:t.accentText,fontSize:16,fontWeight:"700"}}>M</Text>
+                </View>
+                <View style={{gap:1}}>
+                  <Text style={{color:t.ink,fontSize:19,fontWeight:"700",letterSpacing:0.2}}>Muse</Text>
+                  <Text style={{color:t.muted,fontSize:11}}>{tr("Personal assistant")}</Text>
+                </View>
+              </View>
               <IconButton name="settings" floating label={tr("Open settings")} onPress={() => navigate({page:"settings"})}/>
-              <View style={{flex:1}}/>
               <IconButton name="search" floating label={tr("Search conversations")} onPress={() => {setSearching(!searching);setQuery("");}}/>
               <IconButton name="plus" floating label={tr("New chat")} onPress={() => setNewChat(true)}/>
             </View>
@@ -441,7 +466,38 @@ function Shell() {
             <Notice error text={workspace.error || error}/>
             {!searching && homeScroll > 120 && unreadAbove.length > 0 && <Pressable accessibilityRole="button" accessibilityLabel={tr("{count} unread",{count:unreadAbove.length})} onPress={() => {const first=unreadAbove[0];homeList.current?.scrollTo({y:Math.max(0,rowPositions.current[first.id].y-110),animated:true});}} style={{position:"absolute",top:88,alignSelf:"center",zIndex:3,backgroundColor:t.accent,borderRadius:24,paddingHorizontal:14,minHeight:44,flexDirection:"row",alignItems:"center",gap:6}}><Icon name="up" size={18} color={t.accentText}/><Text style={{fontSize:18,fontWeight:"600",color:t.accentText}}>{tr("{count} unread",{count:unreadAbove.length})}</Text></Pressable>}
             <ScrollView ref={homeList} onScroll={event => setHomeScroll(event.nativeEvent.contentOffset.y)} scrollEventThrottle={80} contentContainerStyle={{paddingHorizontal:16,paddingTop:searching ? 0 : 80,paddingBottom:24}} keyboardShouldPersistTaps="handled">
-              {!query && chief && !classic && <Pressable accessibilityRole="button" accessibilityLabel={tr("Open {p0}",{p0:chief.name})} onPress={() => choose(chief.id)} onLongPress={() => {const item=workspace.conversations.find(c=>c.sessionId===chief.sessionId);if(item)details(item);}} style={{alignItems:"center",paddingTop:24,paddingBottom:28,gap:12}}><BotAvatar bot={chief} size={100}/><Text style={{fontSize:16,color:t.muted}}>{chief.name}</Text></Pressable>}
+              {needs.total > 0 && !query && <Pressable accessibilityRole="button" accessibilityLabel={tr("Needs you")} onPress={() => navigate({page:"settings",initial:"needs"})} style={({pressed}) => ({flexDirection:"row",alignItems:"center",gap:12,paddingHorizontal:16,paddingVertical:14,marginBottom:14,borderRadius:18,borderWidth:1,borderColor:t.line,backgroundColor:pressed?t.hover:t.surface})}>
+                <View style={{width:34,height:34,borderRadius:17,backgroundColor:t.soft,alignItems:"center",justifyContent:"center"}}><Icon name="bell" size={17} color={t.accent}/></View>
+                <View style={{flex:1,gap:2}}>
+                  <Text style={{color:t.ink,fontSize:16,fontWeight:"600"}}>{tr("Needs you")}</Text>
+                  <Text style={{color:t.muted,fontSize:12}}>{tr("{count} items waiting",{count:needs.total})}</Text>
+                </View>
+                <View style={{minWidth:26,height:26,borderRadius:13,paddingHorizontal:8,alignItems:"center",justifyContent:"center",backgroundColor:t.accent}}><Text style={{color:t.accentText,fontSize:12,fontWeight:"700"}}>{needs.total}</Text></View>
+                <Icon name="chevron" size={16} color={t.faint}/>
+              </Pressable>}
+              {!query && !classic && <View style={{marginBottom:18,paddingHorizontal:20,paddingTop:18,paddingBottom:20,borderRadius:24,borderWidth:1,borderColor:t.line,backgroundColor:t.surface,overflow:"hidden"}}>
+                {(() => {
+                  const now = new Date();
+                  const hour = now.getHours();
+                  const greeting = hour < 12 ? tr("Good morning") : hour < 18 ? tr("Good afternoon") : tr("Good evening");
+                  const today = now.toLocaleDateString(dateLocale(), { weekday: "long", month: "long", day: "numeric" });
+                  return <>
+                    <Text style={{color:t.muted,fontSize:11,fontWeight:"600",letterSpacing:1.1,textTransform:"uppercase"}}>{today}</Text>
+                    <Text style={{color:t.ink,fontSize:24,fontWeight:"700",letterSpacing:-0.3,marginTop:6}}>{greeting}</Text>
+                    <View style={{flexDirection:"row",flexWrap:"wrap",gap:8,marginTop:14}}>
+                      <View style={{flexDirection:"row",alignItems:"center",gap:6,borderRadius:999,backgroundColor:t.soft,paddingHorizontal:10,paddingVertical:5}}>
+                        <View style={{width:6,height:6,borderRadius:3,backgroundColor:workspace.online?"#3ecf8e":t.faint}}/>
+                        <Text style={{color:t.ink,fontSize:12,fontWeight:"500"}}>{workspace.online ? tr("Online") : tr("Offline")}</Text>
+                      </View>
+                      <View style={{borderRadius:999,backgroundColor:t.hover,paddingHorizontal:10,paddingVertical:5}}>
+                        <Text style={{color:t.muted,fontSize:12,fontWeight:"500"}}>{sorted.length === 1 ? tr("1 conversation") : tr("{count} conversations",{count:sorted.length})}</Text>
+                      </View>
+                    </View>
+                    <Text pointerEvents="none" style={{position:"absolute",right:-6,bottom:-30,fontSize:104,fontWeight:"800",color:t.accent,opacity:0.12}}>M</Text>
+                  </>;
+                })()}
+              </View>}
+              {!query && !!sorted.length && <Text style={{color:t.muted,fontSize:11,fontWeight:"700",letterSpacing:1.1,textTransform:"uppercase",marginLeft:4,marginBottom:10}}>{tr("Conversations")}</Text>}
               {sorted.map(conversationRow)}
               {!sorted.length && <View style={{padding:24,gap:16}}><Label muted>{tr("No conversations found.")}</Label>{classic ? <Button title={tr("New DSH Agent")} disabled={creating || !workspace.online} onPress={addAgent}/> : <Button secondary title={tr("Reconnect")} onPress={workspace.refresh}/>}</View>}
             </ScrollView>

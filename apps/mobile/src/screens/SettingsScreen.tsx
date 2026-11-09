@@ -25,6 +25,7 @@ import {
 } from "../components/UI";
 import { inks } from "../components/BotAvatar";
 import { SchedulesPanel, UsagePanel } from "../features";
+import { NeedsPanel } from "../features/NeedsPanel";
 import { HostSettingsPanel } from "../host-settings/HostSettingsPanel";
 import { Host, tokenStore } from "../storage";
 import { errorText, TeamState } from "../types";
@@ -33,6 +34,7 @@ import { PageTransition } from "../components/Motion";
 import { LocalePreference, useI18n } from "../i18n";
 export type SettingsPage =
   | "tools"
+  | "needs"
   | "capabilities"
   | "skills"
   | "plugins"
@@ -53,6 +55,7 @@ const pages: {
   title: string;
   icon: IconName;
 }[] = [
+  { id: "needs", title: "Needs you", icon: "bell" },
   { id: "notifications", title: "Notifications", icon: "bell" },
   { id: "general", title: "General", icon: "settings" },
   { id: "bots", title: "Bots", icon: "bots" },
@@ -63,7 +66,7 @@ const pages: {
   { id: "usage", title: "Usage", icon: "usage" },
   { id: "secrets", title: "Secrets", icon: "secrets" },
   { id: "feedback", title: "Feedback", icon: "feedback" },
-  { id: "about", title: "About DS Bot", icon: "feedback" },
+  { id: "about", title: "About Muse", icon: "feedback" },
   { id: "updates", title: "Plugin updates", icon: "download" },
   { id: "harness", title: "Harness settings", icon: "settings" },
 ];
@@ -159,7 +162,7 @@ export function SettingsScreen({
         title={tr(
           page === "index"
             ? ""
-            : ({tools:"Tools & skills",skills:"Skills",plugins:"Plugins",capabilities:"Capabilities"}[page as "tools"|"skills"|"plugins"|"capabilities"] || pages.find((p) => p.id === page)?.title || "Settings"),
+            : ({tools:"Tools & skills",needs:"Needs you",skills:"Skills",plugins:"Plugins",capabilities:"Capabilities"}[page as "tools"|"needs"|"skills"|"plugins"|"capabilities"] || pages.find((p) => p.id === page)?.title || "Settings"),
         )}
         onBack={page !== "index" || onBack ? back : undefined}
         close
@@ -175,14 +178,18 @@ export function SettingsScreen({
         <Notice text={notice} />
         {page === "index" && (
           <>
-            <View style={{backgroundColor:t.hover,borderRadius:22,overflow:"hidden"}}>
+            <View style={{backgroundColor:t.surface,borderRadius:22,borderWidth:1,borderColor:t.line,overflow:"hidden"}}>
               <Pressable accessibilityRole="button" accessibilityLabel={tr("Connected host")} onPress={() => setPage("mobile")} style={{flexDirection:"row",alignItems:"center",gap:14,minHeight:80,paddingHorizontal:20,paddingVertical:16}}>
-                <View style={{width:46,height:46,borderRadius:23,backgroundColor:t.line,alignItems:"center",justifyContent:"center"}}><Text style={{fontSize:18,color:t.muted,fontWeight:"600"}}>DS</Text></View>
-                <View style={{flex:1,gap:3}}><Text numberOfLines={1} style={{fontSize:21,color:t.ink}}>{host.name || "DS Bot"}</Text><Text numberOfLines={1} style={{fontSize:16,color:t.muted}}>{new URL(host.url).host}</Text></View><Icon name="chevron" color={t.muted}/>
+                <View style={{width:46,height:46,borderRadius:15,backgroundColor:t.accent,alignItems:"center",justifyContent:"center"}}><Text style={{fontSize:19,color:t.accentText,fontWeight:"800"}}>M</Text></View>
+                <View style={{flex:1,gap:3}}><Text numberOfLines={1} style={{fontSize:21,color:t.ink,fontWeight:"600"}}>{host.name || "Muse"}</Text><Text numberOfLines={1} style={{fontSize:15,color:t.muted}}>{new URL(host.url).host}</Text></View><Icon name="chevron" color={t.muted}/>
               </Pressable>
               <SettingRow title={tr("Usage")} compact onPress={() => setPage("usage")} last/>
             </View>
-            <View style={{backgroundColor:t.hover,borderRadius:22,overflow:"hidden"}}><SettingRow title={tr("Tools & skills")} hint={tr("DS Bot tools, skills and plugins")} onPress={() => setPage("tools")} last/></View>
+            <Section title={tr("Muse")}>
+              <SettingRow title={tr("Needs you")} hint={tr("Memory, skills and tool approvals waiting for you.")} onPress={() => setPage("needs")}/>
+              <SettingRow title={tr("Skills")} hint={tr("Prompt-lazy skills stored on this host.")} onPress={() => {setToolsChild(true);setPage("skills");}}/>
+              <SettingRow title={tr("Tools & plugins")} hint={tr("Tools, plugins and capabilities")} onPress={() => setPage("tools")} last/>
+            </Section>
             <Section title={tr("Bot")}>
               <SettingRow title={tr("Bots & groups")} onPress={() => openTeam?.("bots")}/>
               <SettingRow title={tr("Scheduled tasks")} onPress={() => setPage("schedules")}/>
@@ -194,15 +201,16 @@ export function SettingsScreen({
               <SettingRow title={tr("Appearance")} onPress={() => setPage("general")}/>
               <SettingRow title={tr("Language")} onPress={() => setPage("general")}/>
               <SettingRow title={tr("Plugin updates")} onPress={() => setPage("updates")}/>
-              <SettingRow title={tr("About DS Bot")} onPress={() => setPage("about")} last/>
+              <SettingRow title={tr("About Muse")} onPress={() => setPage("about")} last/>
             </Section>
             <Section title={tr("Host")}>
               {pages.filter(item => ["connectors","secrets","feedback","harness"].includes(item.id)).map((item,index)=><SettingRow key={item.id} title={tr(item.title)} onPress={() => setPage(item.id as SettingsPage)} last={index===3}/>)}
             </Section>
             <Text style={{ textAlign: "center", fontSize: 12, color: t.faint }}>
-              {tr("DS Bot · Mobile")}</Text>
+              {tr("Muse · Mobile")}</Text>
           </>
         )}
+        {page === "needs" && <NeedsPanel client={client} online={online}/>}
         {page === "tools" && <Section title={tr("Tools & skills")}><SettingRow title={tr("Skills")} onPress={() => {setToolsChild(true);setPage("skills");}}/><SettingRow title={tr("Plugins")} onPress={() => {setToolsChild(true);setPage("plugins");}}/><SettingRow title={tr("Connectors")} onPress={() => {setToolsChild(true);setPage("connectors");}}/><SettingRow title={tr("Capabilities")} onPress={() => {setToolsChild(true);setPage("capabilities");}} last/></Section>}
         {page === "capabilities" && <CapabilitiesPanel client={client} team={team} online={online} refresh={refresh}/>}
         {page === "skills" && <SkillsPanel client={client} team={team} online={online} refresh={refresh}/>}
@@ -249,7 +257,7 @@ export function SettingsScreen({
                         />
                       ))}
                     </View>
-                    {(team.prefs?.theme || "deepseek") === key && (
+                    {(team.prefs?.theme || "muse") === key && (
                       <Tag>{tr("Selected")}</Tag>
                     )}
                   </SettingRow>

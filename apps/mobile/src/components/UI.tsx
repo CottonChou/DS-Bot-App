@@ -72,22 +72,22 @@ export function Button({
       disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => ({
-        minHeight: 44,
+        minHeight: 46,
         paddingVertical: compact ? 8 : 10,
-        paddingHorizontal: compact ? 13 : 16,
-        borderRadius: 999,
+        paddingHorizontal: compact ? 13 : 18,
+        borderRadius: 14,
         alignItems: "center",
         justifyContent: "center",
         opacity: disabled ? 0.4 : pressed ? 0.65 : 1,
-        backgroundColor: secondary ? (floating ? t.surface : t.hover) : danger ? t.error : t.accent,
-        borderColor: t.line,
-        borderWidth: floating ? 1 : 0,
+        backgroundColor: secondary ? (floating ? t.surface : "transparent") : danger ? t.error : t.accent,
+        borderColor: secondary ? t.lineStrong : t.line,
+        borderWidth: secondary || floating ? 1 : 0,
       })}
     >
       <Text
         style={{
-          fontSize: 14,
-          fontWeight: "500",
+          fontSize: 15,
+          fontWeight: "600",
           color: secondary ? (danger ? t.error : t.ink) : danger ? contrastText(t.error) : t.accentText,
         }}
       >
@@ -116,10 +116,11 @@ export function Field({
           {
             backgroundColor: t.surface,
             color: t.ink,
-            minHeight: 44,
-            padding: 12,
+            minHeight: 46,
+            paddingHorizontal: 14,
+            paddingVertical: 12,
             borderWidth: 1,
-            borderColor: t.line,
+            borderColor: t.lineStrong,
             borderRadius: 14,
             fontSize: 15,
             textAlignVertical: "top",
@@ -145,7 +146,7 @@ export function Notice({
     <View
       accessibilityRole={error ? "alert" : undefined}
       style={{
-        borderRadius: capsule ? 999 : 12,
+        borderRadius: capsule ? 999 : 14,
         backgroundColor: t.surface,
         borderColor: error ? t.error : t.line,
         borderWidth: 1,
@@ -172,9 +173,9 @@ export function Card({ children }: { children: React.ReactNode }) {
     <View
       style={{
         backgroundColor: t.surface,
-        borderRadius: 18,
-        padding: 16,
-        gap: 12,
+        borderRadius: 20,
+        padding: 18,
+        gap: 14,
         borderWidth: 1,
         borderColor: t.line,
       }}
@@ -233,15 +234,18 @@ export function Sheet({
         <View
           style={{
             backgroundColor: t.bg,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
+            borderTopLeftRadius: 26,
+            borderTopRightRadius: 26,
+            borderTopWidth: 1,
+            borderColor: t.line,
             maxHeight: "90%",
             overflow: "hidden",
-            paddingTop: 20,
+            paddingTop: 12,
             paddingHorizontal: 20,
             paddingBottom: Math.max(16, insets.bottom + 8),
           }}
         >
+          <View style={{ alignSelf: "center", width: 40, height: 4, borderRadius: 2, backgroundColor: t.lineStrong, marginBottom: 10 }} />
           <View style={styles.between}>
             <Label large>{title}</Label>
             <IconButton name="close" floating label={tr("Close")} onPress={onClose} />
@@ -299,7 +303,7 @@ export function IconButton({ name, label, onPress, disabled = false, floating = 
     disabled={disabled} onPress={onPress} style={({pressed}) => ({
       width, height:size, borderRadius:size / 2, alignItems:"center", justifyContent:"center",
       flexShrink:0, backgroundColor:brand ? BRAND_BLUE : primary ? t.ink : floating ? t.surface : pressed ? t.hover : undefined,
-      borderWidth:floating && !primary ? 1 : 0, borderColor:t.line,
+      borderWidth:floating && !primary ? 1 : 0, borderColor:t.lineStrong,
       opacity:disabled ? .35 : pressed ? .65 : 1,
     })}><Icon name={name} size={name === "plus" ? 28 : 23} color={brand ? "#FFFFFF" : primary ? t.bg : t.ink}/></Pressable>;
 }
@@ -354,7 +358,7 @@ export function PageHeader({
         />
       ) : null}
       <View pointerEvents="box-none" style={{ flex: 1, alignItems: 'flex-start' }}>
-        {!!title && <Text numberOfLines={1} style={{ flexShrink: 1, fontSize: 21, fontWeight: "600", color: t.ink, ...(floating ? { backgroundColor: t.surface, borderWidth: 1, borderColor: t.line, borderRadius: 24, overflow: 'hidden' as const, paddingHorizontal: 16, paddingVertical: 10 } : {}) }}>{title}</Text>}
+        {!!title && <Text numberOfLines={1} style={{ flexShrink: 1, fontSize: 19, fontWeight: "600", color: t.ink, ...(floating ? { backgroundColor: t.surface, borderWidth: 1, borderColor: t.line, borderRadius: 20, overflow: 'hidden' as const, paddingHorizontal: 15, paddingVertical: 9 } : {}) }}>{title}</Text>}
       </View>
       {right}
     </View>
@@ -374,9 +378,11 @@ export function Section({
     <View style={{ gap: 8 }}>
       <Text
         style={{
-          fontSize: 14,
-          lineHeight: 20,
-          fontWeight: "400",
+          fontSize: 11,
+          lineHeight: 16,
+          fontWeight: "600",
+          letterSpacing: 0.9,
+          textTransform: "uppercase" as const,
           color: t.muted,
           paddingHorizontal: 20,
         }}
@@ -385,8 +391,10 @@ export function Section({
       </Text>
       <View
         style={{
-          backgroundColor: t.hover,
-          borderRadius: 22,
+          backgroundColor: t.surface,
+          borderRadius: 18,
+          borderWidth: 1,
+          borderColor: t.line,
           overflow: "hidden",
         }}
       >
@@ -438,14 +446,15 @@ export function SettingRow({
         <Text
           style={{
             color: danger ? t.error : t.ink,
-            fontSize: 19,
-            lineHeight: 26,
+            fontSize: 16,
+            lineHeight: 22,
+            fontWeight: "500",
           }}
         >
           {title}
         </Text>
         {hint && (
-          <Text style={{ color: t.muted, fontSize: 14, lineHeight: 20 }}>
+          <Text style={{ color: t.muted, fontSize: 13, lineHeight: 19 }}>
             {hint}
           </Text>
         )}
@@ -458,9 +467,9 @@ export function SettingRow({
     flexDirection: "row" as const,
     alignItems: "center" as const,
     gap: 12,
-    paddingHorizontal: 20,
-    paddingVertical: compact ? 12 : 16,
-    minHeight: compact ? 56 : 64,
+    paddingHorizontal: 16,
+    paddingVertical: compact ? 10 : 14,
+    minHeight: compact ? 50 : 58,
     borderBottomWidth: last ? 0 : 1,
     borderColor: t.line,
     opacity: disabled ? 0.5 : 1,
@@ -518,8 +527,9 @@ export function Tag({ children }: { children: React.ReactNode }) {
       style={{
         fontSize: 11,
         lineHeight: 16,
-        paddingHorizontal: 5,
-        borderRadius: 4,
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 999,
         color: t.tagInk,
         backgroundColor: t.tagBg,
         overflow: "hidden",

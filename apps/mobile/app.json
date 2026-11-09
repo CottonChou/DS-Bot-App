@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "DS Bot",
+    "name": "Muse",
     "slug": "ds-bot-mobile",
     "version": "0.1.4",
     "orientation": "portrait",
@@ -22,7 +22,7 @@
       "allowBackup": false,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#fcfcfc"
+        "backgroundColor": "#6a5cf0"
       }
     },
     "web": {

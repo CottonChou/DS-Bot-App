@@ -3,7 +3,6 @@ import { tr } from "../i18n";
 import { useI18n } from "../i18n";
 import React, { useEffect, useRef, useState } from "react";
 import { Platform, ScrollView, Switch, Text, View } from "react-native";
-import { BotAvatar, mainLook } from "../components/BotAvatar";
 import { PairingScanner } from "../components/PairingScanner";
 import { MobileClient, validateServerUrl } from "@ds-bot/mobile-sdk";
 import {
@@ -138,10 +137,12 @@ export function PairingScreen({
       ]}
     >
       <View style={{ alignItems: "center", gap: 12, paddingBottom: 12 }}>
-        <BotAvatar bot={mainLook} size={72} />
-        <Text style={{ color: t.ink, fontSize: 28, fontWeight: "600" }}>
-          {tr("DS Bot")}</Text>
-        <Label muted>{tr("Connect to your Bot team.")}</Label>
+        <View style={{width:64,height:64,borderRadius:20,backgroundColor:t.accent,alignItems:"center",justifyContent:"center"}}>
+          <Text style={{color:t.accentText,fontSize:28,fontWeight:"800",letterSpacing:-0.5}}>M</Text>
+        </View>
+        <Text style={{ color: t.ink, fontSize: 28, fontWeight: "700", letterSpacing: -0.3 }}>
+          Muse</Text>
+        <Label muted>{tr("Your personal assistant, on your own server.")}</Label>
       </View>
       {Platform.OS === "web" && (
         <Notice

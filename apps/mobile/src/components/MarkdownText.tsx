@@ -41,7 +41,7 @@ export function MarkdownText({ text, color, onLink, onLongPress, fontSize = 14, 
   const nodes = useMemo(() => markdownNodes(text, bots, selfId), [text, bots, selfId]);
   const [linkError, setLinkError] = useState("");
   const ink = color || t.ink;
-  const body: TextStyle = { color: ink, fontSize, lineHeight: fontSize + 8 };
+  const body: TextStyle = { color: ink, fontSize, lineHeight: fontSize + 10 };
   async function open(value: string) {
     if (onLink?.(value)) return;
     const url = safeLink(value);
@@ -74,12 +74,12 @@ export function MarkdownText({ text, color, onLink, onLongPress, fontSize = 14, 
       }
       if (node.type === "bullet_list" || node.type === "ordered_list") {
         const start = Number(node.attrs.start || 1);
-        return <View key={key} style={{ gap: 5 }}>{node.children.map((child, n) => <View key={n} style={{ flexDirection: "row", gap: 7, paddingLeft: 2 }}>
-          <Text style={{ ...body, minWidth: node.type === "ordered_list" ? 21 : 12 }}>{node.type === "ordered_list" ? `${start + n}.` : "•"}</Text>
-          <View style={{ flex: 1, gap: 5 }}>{render(child.children, `${key}:${n}`)}</View>
+        return <View key={key} style={{ gap: 5, width: "100%" }}>{node.children.map((child, n) => <View key={n} style={{ flexDirection: "row", gap: 7, paddingLeft: 2, width: "100%" }}>
+          <Text style={{ ...body, minWidth: node.type === "ordered_list" ? 21 : 12, flexShrink: 0 }}>{node.type === "ordered_list" ? `${start + n}.` : "•"}</Text>
+          <View style={{ flex: 1, flexShrink: 1, gap: 5 }}>{render(child.children, `${key}:${n}`)}</View>
         </View>)}</View>;
       }
-      if (node.type === "blockquote") return <View key={key} style={{ borderLeftWidth: 3, borderColor: t.muted, paddingLeft: 11, gap: 7 }}>{render(node.children, key)}</View>;
+      if (node.type === "blockquote") return <View key={key} style={{ borderLeftWidth: 3, borderColor: t.accent, backgroundColor: t.soft, paddingLeft: 12, paddingVertical: 6, paddingRight: 10, borderTopRightRadius: 6, borderBottomRightRadius: 6, gap: 7 }}>{render(node.children, key)}</View>;
       if (node.type === "hr") return <View key={key} accessible={false} style={{ height: 1, backgroundColor: t.line, marginVertical: 5 }} />;
       if (node.type === "table") {
         const rows = node.children.flatMap(section => section.children);
@@ -88,5 +88,5 @@ export function MarkdownText({ text, color, onLink, onLongPress, fontSize = 14, 
       return <View key={key} style={{ gap: 7 }}>{node.children.length ? render(node.children, key) : <Text selectable={!onLongPress} onLongPress={onLongPress} style={body}>{node.text}</Text>}</View>;
     });
   }
-  return <View style={{ gap: 8 }}>{render(nodes)}{linkError ? <Text accessibilityRole="alert" style={{ color: t.error, fontSize: 12 }}>{tr(linkError)}</Text> : null}</View>;
+  return <View style={{ gap: 10 }}>{render(nodes)}{linkError ? <Text accessibilityRole="alert" style={{ color: t.error, fontSize: 12 }}>{tr(linkError)}</Text> : null}</View>;
 }

@@ -22,7 +22,7 @@
       "allowBackup": false,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#6a5cf0"
+        "backgroundColor": "#0c0c0e"
       }
     },
     "web": {

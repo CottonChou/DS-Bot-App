@@ -10,12 +10,13 @@ import {
   Card,
   Field,
   Label,
+  MuseMark,
   Notice,
   Sheet,
   styles,
 } from "../components/UI";
 import { cache, Host, tokenStore } from "../storage";
-import { useTheme } from "../theme";
+import { useTheme, spacing, radius, typography } from "../theme";
 export function PairingScreen({
   onConnected,
 }: {
@@ -136,13 +137,11 @@ export function PairingScreen({
         },
       ]}
     >
-      <View style={{ alignItems: "center", gap: 12, paddingBottom: 12 }}>
-        <View style={{width:64,height:64,borderRadius:20,backgroundColor:t.accent,alignItems:"center",justifyContent:"center"}}>
-          <Text style={{color:t.accentText,fontSize:28,fontWeight:"800",letterSpacing:-0.5}}>M</Text>
-        </View>
-        <Text style={{ color: t.ink, fontSize: 28, fontWeight: "700", letterSpacing: -0.3 }}>
+      <View style={{ alignItems: "center", gap: spacing.md, paddingBottom: spacing.md }}>
+        <MuseMark size={64} />
+        <Text style={{ ...typography.largeTitle, color: t.ink, letterSpacing: -0.3 }}>
           Muse</Text>
-        <Label muted>{tr("Your personal assistant, on your own server.")}</Label>
+        <Text style={{ ...typography.subheadline, color: t.textSecondary }}>{tr("Your personal assistant, on your own server.")}</Text>
       </View>
       {Platform.OS === "web" && (
         <Notice

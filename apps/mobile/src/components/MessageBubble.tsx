@@ -13,7 +13,7 @@ import { Button, Icon, Notice, Sheet } from "./UI";
 import { MarkdownText } from "./MarkdownText";
 import { BotAvatar } from "./BotAvatar";
 import { MessageActions, MessageAction, REACTIONS } from "./MessageActions";
-import { useTheme } from "../theme";
+import { useTheme, radius, spacing, typography } from "../theme";
 import { Bot, errorText } from "../types";
 import { readCache, writeCache } from "../storage";
 
@@ -148,31 +148,35 @@ export function MessageBubble({ message, client, conversationId, serverId, bot, 
     if (hideQuestionReceipt(tool)) return null;
     const label = tr(toolLabel(tool));
     const failed = tool.state === "error" || tool.isError;
-    return <View style={{ marginVertical: 6, alignSelf: "flex-start", maxWidth: "94%" }}>
-      <Pressable accessibilityRole="button" accessibilityLabel={label + tr(" details")} accessibilityState={{ expanded }} onPress={() => setExpanded(true)} style={({pressed}) => ({ flexDirection: "row", alignItems: "center", gap: 10, minHeight: 48, paddingHorizontal: 14, borderRadius: 16, borderWidth: 1, borderColor: failed ? t.error : t.line, backgroundColor: pressed ? t.hover : t.surface })}>
-        {tool.state === "running" ? <ActivityIndicator size="small" color={t.muted} /> : <Icon name={failed ? "close" : "check"} size={16} color={failed ? t.error : t.muted}/>}
-        <Text numberOfLines={1} style={{ color: t.ink, fontSize: 14, flexShrink: 1 }}>{label}</Text>
-        <Text style={{color:failed ? t.error : t.muted,fontSize:12}}>{tr(failed ? "Failed" : tool.state === "running" ? "Running" : "Completed")}</Text>
-        <Icon name="chevron" size={16} color={t.muted}/>
+    return <View style={{ marginVertical: 4, alignSelf: "flex-start", maxWidth: "100%", width: "100%" }}>
+      <Pressable accessibilityRole="button" accessibilityLabel={label + tr(" details")} accessibilityState={{ expanded }} onPress={() => setExpanded(true)} style={({pressed}) => ({ flexDirection: "row", alignItems: "center", gap: spacing.sm + 2, minHeight: 44, paddingHorizontal: spacing.md, borderRadius: radius.sm, borderWidth: 1, borderColor: t.line, borderLeftWidth: 3, borderLeftColor: failed ? t.error : t.accent, backgroundColor: pressed ? t.hover : t.surface })}>
+        {tool.state === "running" ? <ActivityIndicator size="small" color={t.accent} /> : <Icon name={failed ? "close" : "check"} size={15} color={failed ? t.error : t.success}/>}
+        <Text numberOfLines={1} style={{ ...typography.subheadline, color: t.ink, flexShrink: 1 }}>{label}</Text>
+        <Text style={{ ...typography.caption, color: failed ? t.error : t.textSecondary, marginLeft: "auto" }}>{tr(failed ? "Failed" : tool.state === "running" ? "Running" : "Completed")}</Text>
+        <Icon name="chevron" size={15} color={t.faint}/>
       </Pressable>
       <Sheet title={label} visible={expanded} onClose={() => setExpanded(false)}><ToolResultView tool={tool} /></Sheet>
     </View>;
   }
-  if (message.role === "system") return <Text selectable style={{ color: t.muted, fontSize: 12, lineHeight: 19, textAlign: "center", marginVertical: 12 }}>{systemEventLabel(message.systemEvent, tr) || message.text}</Text>;
-  return <View style={{ alignSelf: mine ? "flex-end" : "stretch", width: "100%", maxWidth: "100%", marginVertical: 10, gap: 4 }}>
-    {showAuthor && !mine && bot ? <Pressable disabled={!onOpenBot} onPress={() => onOpenBot?.(bot.id)} accessibilityRole="button" accessibilityLabel={tr("Open ") + author + tr("'s chat")} style={{flexDirection:"row",alignItems:"center",gap:8,minHeight:44,alignSelf:"flex-start"}}><BotAvatar bot={bot} size={28}/><Text style={{color:t.muted,fontSize:13}}>{author}</Text></Pressable> : showAuthor && !mine && message.author ? <Text style={{color:t.muted,fontSize:13}}>{author}</Text> : null}
+  if (message.role === "system") return <Text selectable style={{ ...typography.caption, color: t.textTertiary, textAlign: "center", marginVertical: 14 }}>{systemEventLabel(message.systemEvent, tr) || message.text}</Text>;
+  return <View style={{ alignSelf: mine ? "flex-end" : "stretch", width: "100%", maxWidth: "100%", marginVertical: 12, gap: 6 }}>
+    {!mine && (
+      showAuthor && bot
+        ? <Pressable disabled={!onOpenBot} onPress={() => onOpenBot?.(bot.id)} accessibilityRole="button" accessibilityLabel={tr("Open ") + author + tr("'s chat")} style={{flexDirection:"row",alignItems:"center",gap:7,minHeight:28,alignSelf:"flex-start"}}><BotAvatar bot={bot} size={22}/><Text style={{...typography.caption, fontWeight: "600", color:t.textSecondary}}>{author}</Text></Pressable>
+        : <View style={{flexDirection:"row",alignItems:"center",gap:6,alignSelf:"flex-start"}}><Text style={{fontSize:12,fontWeight:"700",color:t.accent}}>✦</Text><Text style={{...typography.caption,fontWeight:"600",color:t.textSecondary}}>{author}</Text></View>
+    )}
     {message.reasoning ? <View style={{ marginLeft: 0, gap: 5 }}>
-      <Pressable accessibilityRole="button" accessibilityLabel={tr("Thinking details")} accessibilityState={{ expanded: thinking }} onPress={() => setThinking(!thinking)} style={{ minHeight: 44, justifyContent: "center" }}><Text style={{ color: t.muted, fontSize: 13 }}>{thinking ? "⌃" : "⌄"} {message.pending ? tr("Thinking…") : tr("Thought process")}</Text></Pressable>
-      {thinking ? <View style={{ borderLeftWidth: 2, borderColor: t.line, paddingLeft: 10 }}><Text selectable style={{ color: t.muted, fontSize: 13, lineHeight: 20 }}>{message.reasoning}</Text></View> : null}
+      <Pressable accessibilityRole="button" accessibilityLabel={tr("Thinking details")} accessibilityState={{ expanded: thinking }} onPress={() => setThinking(!thinking)} style={{ minHeight: 36, justifyContent: "center" }}><Text style={{ ...typography.caption, color: t.textTertiary }}>{thinking ? "⌃" : "⌄"} {message.pending ? tr("Thinking…") : tr("Thought process")}</Text></Pressable>
+      {thinking ? <View style={{ borderLeftWidth: 2, borderColor: t.accentSoft, paddingLeft: spacing.md }}><Text selectable style={{ ...typography.caption, color: t.textSecondary, lineHeight: 21 }}>{message.reasoning}</Text></View> : null}
     </View> : null}
-    {!!message.text || !!message.attachments?.length || (message.pending && !message.reasoning) ? <View style={{ flexDirection: mine ? "row-reverse" : "row", alignItems: "flex-end", gap: 8, justifyContent: "flex-start" }}>
-      <Pressable accessible={false} onLongPress={() => !message.pending && openActions()} delayLongPress={350} style={{ maxWidth: mine ? "90%" : "88%", flexShrink: 1, backgroundColor: mine ? t.user : t.bubble, borderRadius: 18, paddingHorizontal: 15, paddingVertical: 12, gap: 10 }}>
+    {!!message.text || !!message.attachments?.length || (message.pending && !message.reasoning) ? <View style={{ flexDirection: mine ? "row-reverse" : "row", alignItems: "flex-end", gap: 8, justifyContent: "flex-start", width: "100%" }}>
+      <Pressable accessible={false} onLongPress={() => !message.pending && openActions()} delayLongPress={350} style={mine ? { maxWidth: "86%", minWidth: 48, flexShrink: 1, backgroundColor: t.user, borderWidth: 1, borderColor: t.line, borderRadius: radius.lg - 2, borderBottomRightRadius: 4, paddingHorizontal: spacing.md + 2, paddingVertical: spacing.sm + 2, gap: 10 } : { width: "100%", maxWidth: "100%", flexShrink: 1, backgroundColor: "transparent", paddingHorizontal: 0, paddingVertical: 2, gap: 10 }}>
         {!!message.text ? <MarkdownText onLongPress={!message.pending ? () => openActions() : undefined} fontSize={16} text={message.text} bots={bots} selfId={mine ? undefined : bot?.id} color={mine ? t.userText : t.ink} onLink={url => {
           if (!url.startsWith("https://bots.local/")) return false;
           try { const id = decodeURIComponent(url.slice("https://bots.local/".length)); if (bots?.some(item => item.id === id)) onOpenBot?.(id); } catch {}
           return true;
-        }} /> : message.pending && !message.reasoning ? <Text style={{ color: t.muted, fontSize: 13 }}>{tr("Thinking…")}</Text> : null}
-        {message.attachments?.map((attachment, index) => attachment.type === "image" ? <ImageAttachment key={attachment.id || index} attachment={attachment} message={message} client={client} conversationId={conversationId} /> : <FileAttachment key={attachment.id || index} attachment={attachment} message={message} client={client} conversationId={conversationId} color={mine ? t.messageText : undefined} />)}
+        }} /> : message.pending && !message.reasoning ? <Text style={{ color: t.muted, fontSize: 13 }}>✦ {tr("Thinking…")}</Text> : null}
+        {message.attachments?.map((attachment, index) => attachment.type === "image" ? <ImageAttachment key={attachment.id || index} attachment={attachment} message={message} client={client} conversationId={conversationId} /> : <FileAttachment key={attachment.id || index} attachment={attachment} message={message} client={client} conversationId={conversationId} color={mine ? t.userText : undefined} />)}
       </Pressable>
 
     </View> : null}

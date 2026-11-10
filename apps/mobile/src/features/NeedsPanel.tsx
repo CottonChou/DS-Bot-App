@@ -1,9 +1,9 @@
 import { tr } from "../i18n";
 import React, { useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
-import { Button, Card, EmptyState, Label, Notice, Section, SettingRow, Tag } from "../components/UI";
+import { Button, Card, EmptyState, Label, Notice, Pill, Section, SettingRow, Tag } from "../components/UI";
 import { AnimatedPressable as Pressable } from "../components/Motion";
-import { useTheme } from "../theme";
+import { useTheme, spacing, radius, typography } from "../theme";
 import { errorText } from "../types";
 import type { MobileClient } from "@ds-bot/mobile-sdk";
 
@@ -116,20 +116,20 @@ export function NeedsPanel({ client, online }: { client: MobileClient; online: b
             hint={tr("Memory candidates, skills and tool approvals will show up here.")}
           />
         ) : (
-          <View style={{ padding: 12, gap: 10 }}>
+          <View style={{ padding: spacing.md, gap: spacing.md }}>
             {data.items.map((item) => (
               <Card key={item.id}>
-                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                  <Text style={{ color: t.ink, fontSize: 12, fontWeight: "600", letterSpacing: 0.4 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: spacing.sm }}>
+                  <Pill tone={item.kind === "approval" ? "warning" : "accent"}>
                     {tr(KIND_LABEL[item.kind])}
-                  </Text>
+                  </Pill>
                   {item.kind === "memory" ? <Tag>{tr(item.action)}</Tag> : null}
                 </View>
-                <Text selectable style={{ color: t.ink, fontSize: 15, lineHeight: 22 }}>
+                <Text selectable style={{ ...typography.bodyStrong, color: t.ink }}>
                   {item.title}
                 </Text>
-                {!!item.detail && <Text style={{ color: t.muted, fontSize: 12, lineHeight: 18 }}>{item.detail}</Text>}
-                <View style={{ flexDirection: "row", justifyContent: "flex-end", gap: 10 }}>
+                {!!item.detail && <Text style={{ ...typography.caption, color: t.textSecondary }}>{item.detail}</Text>}
+                <View style={{ flexDirection: "row", justifyContent: "flex-end", gap: spacing.sm + 2, marginTop: spacing.xs }}>
                   <Button
                     secondary
                     danger

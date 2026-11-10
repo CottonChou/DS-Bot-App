@@ -16,10 +16,64 @@ import {
 } from "react-native";
 import { AnimatedPressable as Pressable, PageTransition } from "./Motion";
 import { contrastText, useTheme, spacing, radius, typography } from "../theme";
-import { BRAND_BLUE } from "../logic/colors";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Svg, { Path, Circle, Rect } from "react-native-svg";
+
+export function MuseMark({ size = 34, watermark = false }: { size?: number; watermark?: boolean }) {
+  const t = useTheme();
+  if (watermark) {
+    return (
+      <Svg width={size} height={size} viewBox="0 0 128 128">
+        <Path
+          d="M30 50 C47 34, 62 34, 78 50 C86 58, 93 58, 99 52"
+          fill="none"
+          stroke={t.accent}
+          strokeWidth={10}
+          strokeLinecap="round"
+        />
+        <Path
+          d="M29 77 C46 61, 61 61, 77 77 C85 85, 92 85, 99 79"
+          fill="none"
+          stroke={t.accent}
+          strokeWidth={10}
+          strokeLinecap="round"
+        />
+        <Circle cx={94} cy={34} r={6} fill={t.accent} />
+      </Svg>
+    );
+  }
+  return (
+    <Svg width={size} height={size} viewBox="0 0 128 128">
+      <Rect
+        x={2}
+        y={2}
+        width={124}
+        height={124}
+        rx={28}
+        fill={t.dark ? "#15151d" : "#181822"}
+        stroke={t.dark ? "#2c2c38" : "#2e2e3d"}
+        strokeWidth={2}
+      />
+      <Path
+        d="M30 50 C47 34, 62 34, 78 50 C86 58, 93 58, 99 52"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth={9}
+        strokeLinecap="round"
+      />
+      <Path
+        d="M29 77 C46 61, 61 61, 77 77 C85 85, 92 85, 99 79"
+        fill="none"
+        stroke="#8b7cff"
+        strokeWidth={9}
+        strokeLinecap="round"
+      />
+      <Circle cx={94} cy={34} r={5.5} fill="#8b7cff" />
+    </Svg>
+  );
+}
 export function Label({
   children,
   muted = false,
@@ -96,25 +150,25 @@ export function Field({
 }) {
   const t = useTheme();
   return (
-    <View style={{ gap: 7 }}>
-      <Text style={{ color: t.ink, fontSize: 13, fontWeight: "500" }}>
+    <View style={{ gap: spacing.xs + 3 }}>
+      <Text style={{ ...typography.subheadline, color: t.ink, fontWeight: "600" }}>
         {label}
       </Text>
       <TextInput
         accessibilityLabel={label}
-        placeholderTextColor={t.muted}
+        placeholderTextColor={t.faint}
         {...props}
         style={[
           {
+            ...typography.body,
             backgroundColor: t.surface,
             color: t.ink,
-            minHeight: 46,
-            paddingHorizontal: 14,
-            paddingVertical: 12,
+            minHeight: 48,
+            paddingHorizontal: spacing.md + 2,
+            paddingVertical: spacing.md,
             borderWidth: 1,
             borderColor: t.lineStrong,
-            borderRadius: 14,
-            fontSize: 15,
+            borderRadius: radius.md,
             textAlignVertical: "top",
           },
           props.style,
@@ -138,20 +192,20 @@ export function Notice({
     <View
       accessibilityRole={error ? "alert" : undefined}
       style={{
-        borderRadius: capsule ? 999 : 14,
+        borderRadius: capsule ? radius.pill : radius.md,
         backgroundColor: t.surface,
         borderColor: error ? t.error : t.line,
         borderWidth: 1,
-        padding: 12,
-        paddingHorizontal: capsule ? 20 : 12,
+        padding: spacing.md,
+        paddingHorizontal: capsule ? spacing.xl - 4 : spacing.md,
       }}
     >
       <Text
         selectable
         style={{
-          color: error ? t.error : t.muted,
-          fontSize: 13,
-          lineHeight: 20,
+          ...typography.caption,
+          color: error ? t.error : t.textSecondary,
+          lineHeight: 19,
         }}
       >
         {tr(text)}
@@ -165,9 +219,9 @@ export function Card({ children }: { children: React.ReactNode }) {
     <View
       style={{
         backgroundColor: t.surface,
-        borderRadius: 20,
-        padding: 18,
-        gap: 14,
+        borderRadius: radius.lg,
+        padding: spacing.lg,
+        gap: spacing.md + 2,
         borderWidth: 1,
         borderColor: t.line,
       }}
@@ -294,10 +348,10 @@ export function IconButton({ name, label, onPress, disabled = false, floating = 
   return <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{disabled}}
     disabled={disabled} onPress={onPress} style={({pressed}) => ({
       width, height:size, borderRadius:size / 2, alignItems:"center", justifyContent:"center",
-      flexShrink:0, backgroundColor:brand ? BRAND_BLUE : primary ? t.ink : floating ? t.surface : pressed ? t.hover : undefined,
-      borderWidth:floating && !primary ? 1 : 0, borderColor:t.lineStrong,
-      opacity:disabled ? .35 : pressed ? .65 : 1,
-    })}><Icon name={name} size={name === "plus" ? 28 : 23} color={brand ? "#FFFFFF" : primary ? t.bg : t.ink}/></Pressable>;
+      flexShrink:0, backgroundColor:brand ? t.accent : primary ? t.ink : floating ? t.surface : pressed ? t.hover : undefined,
+      borderWidth:floating && !primary && !brand ? 1 : 0, borderColor:t.lineStrong,
+      opacity:disabled ? .35 : pressed ? .75 : 1,
+    })}><Icon name={name} size={name === "plus" ? 28 : 23} color={brand ? t.accentText : primary ? t.bg : t.ink}/></Pressable>;
 }
 export function PageHeader({
   title,
@@ -367,16 +421,12 @@ export function Section({
 }) {
   const t = useTheme();
   return (
-    <View style={{ gap: 8 }}>
+    <View style={{ gap: spacing.sm }}>
       <Text
         style={{
-          fontSize: 11,
-          lineHeight: 16,
-          fontWeight: "600",
-          letterSpacing: 0.9,
-          textTransform: "uppercase" as const,
-          color: t.muted,
-          paddingHorizontal: 20,
+          ...typography.section,
+          color: t.textSecondary,
+          paddingHorizontal: spacing.xl - 4,
         }}
       >
         {title}
@@ -384,7 +434,7 @@ export function Section({
       <View
         style={{
           backgroundColor: t.surface,
-          borderRadius: 18,
+          borderRadius: radius.lg - 2,
           borderWidth: 1,
           borderColor: t.line,
           overflow: "hidden",
@@ -395,10 +445,9 @@ export function Section({
       {footer && (
         <Text
           style={{
-            fontSize: 12,
-            lineHeight: 17,
-            color: t.muted,
-            paddingHorizontal: 4,
+            ...typography.caption,
+            color: t.textTertiary,
+            paddingHorizontal: spacing.xs,
           }}
         >
           {footer}
@@ -438,15 +487,14 @@ export function SettingRow({
         <Text
           style={{
             color: danger ? t.error : t.ink,
-            fontSize: 16,
-            lineHeight: 22,
+            ...typography.body,
             fontWeight: "500",
           }}
         >
           {title}
         </Text>
         {hint && (
-          <Text style={{ color: t.muted, fontSize: 13, lineHeight: 19 }}>
+          <Text style={{ ...typography.caption, color: t.textSecondary }}>
             {hint}
           </Text>
         )}
@@ -458,9 +506,9 @@ export function SettingRow({
   const style = {
     flexDirection: "row" as const,
     alignItems: "center" as const,
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingVertical: compact ? 10 : 14,
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: compact ? spacing.sm + 2 : spacing.md + 2,
     minHeight: compact ? 50 : 58,
     borderBottomWidth: last ? 0 : 1,
     borderColor: t.line,
@@ -517,11 +565,12 @@ export function Tag({ children }: { children: React.ReactNode }) {
   return (
     <Text
       style={{
+        ...typography.caption,
         fontSize: 11,
         lineHeight: 16,
-        paddingHorizontal: 8,
+        paddingHorizontal: spacing.sm,
         paddingVertical: 2,
-        borderRadius: 999,
+        borderRadius: radius.pill,
         color: t.tagInk,
         backgroundColor: t.tagBg,
         overflow: "hidden",

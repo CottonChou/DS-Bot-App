@@ -139,7 +139,6 @@ export function ChatScreen({
   const [referencePicker, setReferencePicker] = useState(false);
   const [composerFocused, setComposerFocused] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const [dockHeight, setDockHeight] = useState(88);
   const [inputHeight, setInputHeight] = useState(44);
   const [selection, setSelection] = useState({ start: 0, end: 0 });
   const [dismissedMention, setDismissedMention] = useState("");
@@ -313,33 +312,33 @@ export function ChatScreen({
       behavior={Platform.OS === "web" ? undefined : "padding"}
       keyboardVerticalOffset={insets.top}
     >
-      <View style={{ flex: 1 }}>
-      <View pointerEvents="box-none" style={{ position: "absolute", top: 16, left: 20, right: 20, zIndex: 10 }}>
-        <View pointerEvents="box-none" style={{ flexDirection: "row", alignItems: "center", minHeight: 50, gap: 10 }}>
-          <IconButton name="back" floating label={tr("Back to conversations")} onPress={onOpenNavigation || (() => setPicker(true))} />
-          <View pointerEvents="box-none" style={{ flex: 1, alignItems: "flex-start" }}>
-            <Pressable accessibilityRole="button" accessibilityLabel={tr("Open ") + conversation.name + tr(" details")} onPress={onOpenDetails || (() => setPicker(true))} style={{ minHeight: 48, maxWidth: "100%", flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 28, borderWidth: 1, borderColor: t.line, backgroundColor: t.surface }}>
-              {room ? <RoomAvatar room={room} team={team} size={30} /> : <BotAvatar bot={bot || { id: conversation.id, name: conversation.name }} size={30} />}
-              <Text numberOfLines={1} style={{ color: t.ink, fontSize: 18, fontWeight: "600", flexShrink: 1 }}>{conversation.name}</Text>
+      <View style={{ flex: 1, backgroundColor: t.bg }}>
+      <View style={{ backgroundColor: t.bg, borderBottomWidth: 1, borderBottomColor: t.line, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 10, zIndex: 10 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", minHeight: 44, gap: 8 }}>
+          <IconButton name="back" label={tr("Back to conversations")} onPress={onOpenNavigation || (() => setPicker(true))} />
+          <View style={{ flex: 1, alignItems: "flex-start" }}>
+            <Pressable accessibilityRole="button" accessibilityLabel={tr("Open ") + conversation.name + tr(" details")} onPress={onOpenDetails || (() => setPicker(true))} style={{ minHeight: 40, maxWidth: "100%", flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 4 }}>
+              {room ? <RoomAvatar room={room} team={team} size={26} /> : <BotAvatar bot={bot || { id: conversation.id, name: conversation.name }} size={26} />}
+              <Text numberOfLines={1} style={{ color: t.ink, fontSize: 17, fontWeight: "600", flexShrink: 1 }}>{conversation.name}</Text>
             </Pressable>
           </View>
-          <IconButton name="more" floating label={tr("Conversation options")} onPress={() => setOptions(true)} />
+          <IconButton name="more" label={tr("Conversation options")} onPress={() => setOptions(true)} />
         </View>
       </View>
-      {connectionNotice && <View style={{ paddingTop: 82, paddingHorizontal: 16, paddingBottom: 8 }}>{connectionNotice}</View>}
+      {connectionNotice && <View style={{ paddingTop: 10, paddingHorizontal: 20, paddingBottom: 6 }}>{connectionNotice}</View>}
       <FlatList
         ref={list}
         style={{ flex: 1 }}
         data={displayMessages}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: connectionNotice ? 8 : 82,
+          paddingHorizontal: 20,
+          paddingTop: 16,
           flexGrow: 1,
         }}
         keyboardShouldPersistTaps="handled"
         onLayout={() => { if (bottom.current) requestAnimationFrame(() => list.current?.scrollToEnd({animated:false})); }}
-        scrollIndicatorInsets={{ top: connectionNotice ? 0 : 76, bottom: dockHeight }}
+        scrollIndicatorInsets={{ top: 0, bottom: 0 }}
         maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
         onScrollBeginDrag={() => {
           positioned.current = true;
@@ -382,11 +381,11 @@ export function ChatScreen({
           </View>
         }
         ListEmptyComponent={
-          <View style={{ flex: 1, justifyContent: "flex-end", paddingVertical: 22, gap: 12 }}>
-            <View style={{ flexDirection: "row", alignItems: "flex-end", gap: 8 }}>
-              {room && <RoomAvatar room={room} team={team} size={24} />}
-              <View style={{ flex: 1, backgroundColor: t.bubble, borderRadius: 18, paddingVertical: 9, paddingHorizontal: 12 }}>
-                <Text style={{ color: t.ink, fontSize: 14, lineHeight: 22 }}>{bot?.waiting ? tr("Hi, I'm ") + bot.name + tr(". Pick a model for me first. You can change it later in my details.") : room ? tr("Message the group, or @mention a Bot to bring it into the conversation.") : tr("Message ") + conversation.name + tr(" to get started.")}</Text>
+          <View style={{ flex: 1, justifyContent: "flex-end", paddingVertical: 24, gap: 14 }}>
+            <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 10 }}>
+              {room ? <RoomAvatar room={room} team={team} size={24} /> : <Text style={{ color: t.accent, fontSize: 14, fontWeight: "700", marginTop: 2 }}>✦</Text>}
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: t.ink, fontSize: 15, lineHeight: 24 }}>{bot?.waiting ? tr("Hi, I'm ") + bot.name + tr(". Pick a model for me first. You can change it later in my details.") : room ? tr("Message the group, or @mention a Bot to bring it into the conversation.") : tr("Message ") + conversation.name + tr(" to get started.")}</Text>
               </View>
             </View>
             {bot?.waiting ? <View style={{ marginLeft: 32, gap: 8 }}>
@@ -426,7 +425,7 @@ export function ChatScreen({
           </View>;
         }}
         ListFooterComponent={
-          <View style={{ paddingBottom: dockHeight + 12 }}>
+          <View style={{ paddingBottom: 16 }}>
             <ApprovalCards client={client} conversationId={conversation.id} online={online} messages={chat.messages} />
             {bot ? <SecretRequestCards botId={bot.id} client={client} team={team} online={writable} refresh={refresh} /> : null}
             {chat.queue.map((item) => (
@@ -458,13 +457,10 @@ export function ChatScreen({
           </View>
         }
       />
-      <View pointerEvents="box-none"
-        onLayout={event => { const height = Math.ceil(event.nativeEvent.layout.height); setDockHeight(previous => Math.abs(previous - height) > 1 ? height : previous); }}
-        style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 10 }}>
-      {room && <GroupProgress client={client} room={room} team={team} running={chat.running} online={online && chat.status === "connected"} onOpenDetails={onOpenDetails} onProgress={receiveProgress} />}
-      {ownWork && online && chat.status === "connected" && <WorkCapsule label={ownWaitingStatus || (ownWork.switching ? tr("Moving to a fresh conversation") : workDescription(ownWork) || tr("Working"))} onPress={onOpenDetails}/>}
+      <View
+        style={{ backgroundColor: t.bg, borderTopWidth: 1, borderTopColor: t.line, zIndex: 10 }}>
       {newMessages && (
-        <View pointerEvents="box-none" style={{alignItems:"center",paddingVertical:4}}><Button
+        <View pointerEvents="box-none" style={{ position: "absolute", bottom: "100%", left: 0, right: 0, alignItems: "center", paddingBottom: 10 }}><Button
           floating
           title={tr("↓ New messages")}
           secondary
@@ -476,11 +472,13 @@ export function ChatScreen({
           }}
         /></View>
       )}
+      {room && <GroupProgress client={client} room={room} team={team} running={chat.running} online={online && chat.status === "connected"} onOpenDetails={onOpenDetails} onProgress={receiveProgress} />}
+      {ownWork && online && chat.status === "connected" && <WorkCapsule label={ownWaitingStatus || (ownWork.switching ? tr("Moving to a fresh conversation") : workDescription(ownWork) || tr("Working"))} onPress={onOpenDetails}/>}
       <View
         pointerEvents="box-none"
         style={{
-          paddingHorizontal: 20,
-          paddingTop: 6,
+          paddingHorizontal: 16,
+          paddingTop: 10,
           paddingBottom: keyboardVisible ? 8 : insets.bottom + 8,
           gap: 9,
         }}

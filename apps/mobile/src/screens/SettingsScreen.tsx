@@ -15,6 +15,7 @@ import {
   Icon,
   IconName,
   Label,
+  MuseMark,
   Notice,
   PageHeader,
   Section,
@@ -29,7 +30,7 @@ import { NeedsPanel } from "../features/NeedsPanel";
 import { HostSettingsPanel } from "../host-settings/HostSettingsPanel";
 import { Host, tokenStore } from "../storage";
 import { errorText, TeamState } from "../types";
-import { THEMES, useTheme } from "../theme";
+import { THEMES, useTheme, spacing, radius, typography } from "../theme";
 import { PageTransition } from "../components/Motion";
 import { LocalePreference, useI18n } from "../i18n";
 export type SettingsPage =
@@ -178,10 +179,10 @@ export function SettingsScreen({
         <Notice text={notice} />
         {page === "index" && (
           <>
-            <View style={{backgroundColor:t.surface,borderRadius:22,borderWidth:1,borderColor:t.line,overflow:"hidden"}}>
-              <Pressable accessibilityRole="button" accessibilityLabel={tr("Connected host")} onPress={() => setPage("mobile")} style={{flexDirection:"row",alignItems:"center",gap:14,minHeight:80,paddingHorizontal:20,paddingVertical:16}}>
-                <View style={{width:46,height:46,borderRadius:15,backgroundColor:t.accent,alignItems:"center",justifyContent:"center"}}><Text style={{fontSize:19,color:t.accentText,fontWeight:"800"}}>M</Text></View>
-                <View style={{flex:1,gap:3}}><Text numberOfLines={1} style={{fontSize:21,color:t.ink,fontWeight:"600"}}>{host.name || "Muse"}</Text><Text numberOfLines={1} style={{fontSize:15,color:t.muted}}>{new URL(host.url).host}</Text></View><Icon name="chevron" color={t.muted}/>
+            <View style={{backgroundColor:t.surface,borderRadius:radius.lg + 2,borderWidth:1,borderColor:t.line,overflow:"hidden"}}>
+              <Pressable accessibilityRole="button" accessibilityLabel={tr("Connected host")} onPress={() => setPage("mobile")} style={{flexDirection:"row",alignItems:"center",gap:spacing.md + 2,minHeight:80,paddingHorizontal:spacing.lg + 4,paddingVertical:spacing.lg}}>
+                <MuseMark size={48} />
+                <View style={{flex:1,gap:3}}><Text numberOfLines={1} style={{...typography.title,fontSize:20,color:t.ink}}>{host.name || "Muse"}</Text><Text numberOfLines={1} style={{...typography.caption,color:t.textSecondary}}>{new URL(host.url).host}</Text></View><Icon name="chevron" color={t.faint}/>
               </Pressable>
               <SettingRow title={tr("Usage")} compact onPress={() => setPage("usage")} last/>
             </View>

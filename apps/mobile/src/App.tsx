@@ -18,11 +18,14 @@ import { Conversation, Message, MobileClient } from "@ds-bot/mobile-sdk";
 import {
   Busy,
   Button,
+  EmptyState,
   Icon,
   IconButton,
   Label,
+  MuseMark,
   Notice,
   PageHeader,
+  Pill,
   SettingRow,
   Sheet,
   Tag,
@@ -45,7 +48,7 @@ import {
   tokenStore,
   writeCache,
 } from "./storage";
-import { setThemePreferences, useTheme, typography } from "./theme";
+import { setThemePreferences, useTheme, typography, spacing, radius } from "./theme";
 import { errorText } from "./types";
 import {
   dateLocale,
@@ -373,12 +376,12 @@ function Shell() {
         style={({ pressed }) => ({
           flexDirection: "row",
           alignItems: "center",
-          gap: 14,
-          paddingHorizontal: 14,
-          paddingVertical: 14,
+          gap: spacing.md + 2,
+          paddingHorizontal: spacing.md + 2,
+          paddingVertical: spacing.md + 2,
           minHeight: 78,
-          marginBottom: 10,
-          borderRadius: 18,
+          marginBottom: spacing.sm + 2,
+          borderRadius: radius.lg - 2,
           borderWidth: 1,
           borderColor: t.line,
           backgroundColor: pressed ? t.hover : t.surface,
@@ -397,25 +400,24 @@ function Shell() {
           <Text
             numberOfLines={1}
             style={{
+              ...typography.headline,
               color: t.ink,
-              fontWeight: "600",
-              fontSize: 17,
             }}
           >
             {item.name || tr("New conversation")}
             {needsApproval ? " · " + tr("Waiting for approval") : ""}
           </Text>
-          <Text numberOfLines={1} style={{fontSize:14,lineHeight:20,color:t.muted}}>
+          <Text numberOfLines={1} style={{ ...typography.subheadline, color: t.textSecondary }}>
             {workPreview || previews[item.id]?.text.replace(/\s+/g," ").trim() || (previews[item.id]?.attachments?.length ? tr("Attachment message") : "") || (typeof item.preview === "string" && item.preview) ||
               (item.waiting ? tr("Waiting for your answer") : bot?.role || (room ? room.members.map(id => workspace.team.bots.find(b => b.id === id)?.name || id).join(" · ") : tr("DSH Agent")))}
           </Text>
         </View>
         <View style={{alignItems:"flex-end",alignSelf:"stretch",justifyContent:"space-between",paddingVertical:4,gap:10}}>
-          {!!lastActivity && <Text style={{fontSize:12,color:t.muted}}>{new Date(lastActivity).toLocaleDateString() === new Date().toLocaleDateString()
+          {!!lastActivity && <Text style={{ ...typography.caption, color: t.textTertiary }}>{new Date(lastActivity).toLocaleDateString() === new Date().toLocaleDateString()
             ? new Date(lastActivity).toLocaleTimeString(locale === "zh" ? "zh-CN" : "en-US",{hour:"2-digit",minute:"2-digit"})
             : new Date(lastActivity).toLocaleDateString(locale === "zh" ? "zh-CN" : "en-US",{month:"short",day:"numeric"})}</Text>}
           {notificationInbox?.items.some(event => !event.read && (event.conversationId === item.id || item.id === `bot:${event.conversationId}` || item.id === `room:${event.conversationId}`))
-            ? <View accessibilityLabel={tr("Unread")} style={{width:11,height:11,borderRadius:6,backgroundColor:t.accent}}/>
+            ? <View accessibilityLabel={tr("Unread")} style={{width:10,height:10,borderRadius:5,backgroundColor:t.accent}}/>
             : (item.pinned || bot?.pinned || room?.pinned) ? <Icon name="pin" size={14} color={t.muted}/> : null}
         </View>
       </Pressable>
@@ -450,9 +452,7 @@ function Shell() {
           <View style={{flex:1}}>
             <View pointerEvents="box-none" style={{position:"absolute",top:0,left:0,right:0,zIndex:2,flexDirection:"row",alignItems:"center",paddingHorizontal:20,paddingTop:16,paddingBottom:12,gap:10}}>
               <View style={{flex:1,flexDirection:"row",alignItems:"center",gap:11}}>
-                <View style={{width:34,height:34,borderRadius:17,backgroundColor:t.accent,alignItems:"center",justifyContent:"center"}}>
-                  <Text style={{color:t.accentText,fontSize:16,fontWeight:"700"}}>M</Text>
-                </View>
+                <MuseMark size={34} />
                 <View style={{gap:1}}>
                   <Text style={{color:t.ink,fontSize:19,fontWeight:"700",letterSpacing:0.2}}>Muse</Text>
                   <Text style={{color:t.muted,fontSize:11}}>{tr("Personal assistant")}</Text>
@@ -466,13 +466,13 @@ function Shell() {
             <Notice error text={workspace.error || error}/>
             {!searching && homeScroll > 120 && unreadAbove.length > 0 && <Pressable accessibilityRole="button" accessibilityLabel={tr("{count} unread",{count:unreadAbove.length})} onPress={() => {const first=unreadAbove[0];homeList.current?.scrollTo({y:Math.max(0,rowPositions.current[first.id].y-110),animated:true});}} style={{position:"absolute",top:88,alignSelf:"center",zIndex:3,backgroundColor:t.accent,borderRadius:24,paddingHorizontal:14,minHeight:44,flexDirection:"row",alignItems:"center",gap:6}}><Icon name="up" size={18} color={t.accentText}/><Text style={{fontSize:18,fontWeight:"600",color:t.accentText}}>{tr("{count} unread",{count:unreadAbove.length})}</Text></Pressable>}
             <ScrollView ref={homeList} onScroll={event => setHomeScroll(event.nativeEvent.contentOffset.y)} scrollEventThrottle={80} contentContainerStyle={{paddingHorizontal:16,paddingTop:searching ? 0 : 80,paddingBottom:24}} keyboardShouldPersistTaps="handled">
-              {needs.total > 0 && !query && <Pressable accessibilityRole="button" accessibilityLabel={tr("Needs you")} onPress={() => navigate({page:"settings",initial:"needs"})} style={({pressed}) => ({flexDirection:"row",alignItems:"center",gap:12,paddingHorizontal:16,paddingVertical:14,marginBottom:14,borderRadius:18,borderWidth:1,borderColor:t.line,backgroundColor:pressed?t.hover:t.surface})}>
-                <View style={{width:34,height:34,borderRadius:17,backgroundColor:t.soft,alignItems:"center",justifyContent:"center"}}><Icon name="bell" size={17} color={t.accent}/></View>
+              {needs.total > 0 && !query && <Pressable accessibilityRole="button" accessibilityLabel={tr("Needs you")} onPress={() => navigate({page:"settings",initial:"needs"})} style={({pressed}) => ({flexDirection:"row",alignItems:"center",gap:spacing.md,paddingHorizontal:spacing.lg,paddingVertical:spacing.md + 2,marginBottom:spacing.md + 2,borderRadius:radius.lg - 2,borderWidth:1,borderColor:t.line,backgroundColor:pressed?t.hover:t.surface})}>
+                <View style={{width:36,height:36,borderRadius:18,backgroundColor:t.accentSoft,alignItems:"center",justifyContent:"center"}}><Icon name="bell" size={18} color={t.accent}/></View>
                 <View style={{flex:1,gap:2}}>
                   <Text style={{...typography.bodyStrong,color:t.ink}}>{tr("Needs you")}</Text>
-                  <Text style={{...typography.caption,color:t.muted}}>{tr("{count} items waiting",{count:needs.total})}</Text>
+                  <Text style={{...typography.caption,color:t.textSecondary}}>{tr("{count} items waiting",{count:needs.total})}</Text>
                 </View>
-                <View style={{minWidth:26,height:26,borderRadius:13,paddingHorizontal:8,alignItems:"center",justifyContent:"center",backgroundColor:t.accent}}><Text style={{color:t.accentText,fontSize:12,fontWeight:"700"}}>{needs.total}</Text></View>
+                <View style={{minWidth:26,height:26,borderRadius:radius.pill,paddingHorizontal:spacing.sm,alignItems:"center",justifyContent:"center",backgroundColor:t.accent}}><Text style={{color:t.accentText,fontSize:12,fontWeight:"700"}}>{needs.total}</Text></View>
                 <Icon name="chevron" size={16} color={t.faint}/>
               </Pressable>}
               {!query && !classic && <View style={{marginBottom:18,paddingHorizontal:20,paddingTop:18,paddingBottom:20,borderRadius:24,borderWidth:1,borderColor:t.line,backgroundColor:t.surface,overflow:"hidden"}}>
@@ -484,22 +484,28 @@ function Shell() {
                   return <>
                     <Text style={{...typography.section,color:t.textSecondary}}>{today}</Text>
                     <Text style={{...typography.largeTitle,fontSize:24,letterSpacing:-0.3,color:t.ink,marginTop:6}}>{greeting}</Text>
-                    <View style={{flexDirection:"row",flexWrap:"wrap",gap:8,marginTop:14}}>
-                      <View style={{flexDirection:"row",alignItems:"center",gap:6,borderRadius:999,backgroundColor:t.soft,paddingHorizontal:10,paddingVertical:5}}>
-                        <View style={{width:6,height:6,borderRadius:3,backgroundColor:workspace.online?t.success:t.faint}}/>
-                        <Text style={{color:t.ink,fontSize:12,fontWeight:"500"}}>{workspace.online ? tr("Online") : tr("Offline")}</Text>
-                      </View>
-                      <View style={{borderRadius:999,backgroundColor:t.hover,paddingHorizontal:10,paddingVertical:5}}>
-                        <Text style={{color:t.textSecondary,fontSize:12,fontWeight:"500"}}>{sorted.length === 1 ? tr("1 conversation") : tr("{count} conversations",{count:sorted.length})}</Text>
-                      </View>
+                    <View style={{flexDirection:"row",flexWrap:"wrap",gap:spacing.sm,marginTop:spacing.md + 2}}>
+                      <Pill tone={workspace.online ? "success" : "neutral"} dot>
+                        {workspace.online ? tr("Online") : tr("Offline")}
+                      </Pill>
+                      <Pill tone="neutral">
+                        {sorted.length === 1 ? tr("1 conversation") : tr("{count} conversations",{count:sorted.length})}
+                      </Pill>
                     </View>
-                    <Text pointerEvents="none" style={{position:"absolute",right:-6,bottom:-30,fontSize:104,fontWeight:"800",color:t.accent,opacity:0.12}}>M</Text>
+                    <View pointerEvents="none" style={{position:"absolute",right:8,bottom:-12,opacity:0.13}}><MuseMark size={108} watermark /></View>
                   </>;
                 })()}
               </View>}
               {!query && !!sorted.length && <Text style={{...typography.section,color:t.textSecondary,marginLeft:4,marginBottom:10}}>{tr("Conversations")}</Text>}
               {sorted.map(conversationRow)}
-              {!sorted.length && <View style={{padding:24,gap:16}}><Label muted>{tr("No conversations found.")}</Label>{classic ? <Button title={tr("New DSH Agent")} disabled={creating || !workspace.online} onPress={addAgent}/> : <Button secondary title={tr("Reconnect")} onPress={workspace.refresh}/>}</View>}
+              {!sorted.length && (
+                <EmptyState
+                  glyph="chat"
+                  title={tr("No conversations found.")}
+                  actionTitle={classic ? tr("New DSH Agent") : tr("Reconnect")}
+                  onAction={classic ? addAgent : workspace.refresh}
+                />
+              )}
             </ScrollView>
           </View>
         ) : route.page === "chat" ? (
@@ -520,7 +526,7 @@ function Shell() {
             />
           ) : (
             <>
-              <PageHeader title={tr("DS Bot")} onOpenNavigation={showNavigation} />
+              <PageHeader title={tr("Muse")} onOpenNavigation={showNavigation} />
               <View
                 style={{
                   flex: 1,
@@ -530,7 +536,7 @@ function Shell() {
                   gap: 18,
                 }}
               >
-                <BotAvatar bot={mainLook} size={64} />
+                <MuseMark size={64} />
                 <Label large>
                   {tr(
                     classic

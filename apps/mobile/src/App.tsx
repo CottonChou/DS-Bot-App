@@ -22,7 +22,7 @@ import {
   Icon,
   IconButton,
   Label,
-  MuseMark,
+  AsteriaMark,
   Notice,
   PageHeader,
   Pill,
@@ -452,9 +452,9 @@ function Shell() {
           <View style={{flex:1}}>
             <View pointerEvents="box-none" style={{position:"absolute",top:0,left:0,right:0,zIndex:2,flexDirection:"row",alignItems:"center",paddingHorizontal:20,paddingTop:16,paddingBottom:12,gap:10}}>
               <View style={{flex:1,flexDirection:"row",alignItems:"center",gap:11}}>
-                <MuseMark size={34} />
+                <AsteriaMark size={34} />
                 <View style={{gap:1}}>
-                  <Text style={{color:t.ink,fontSize:19,fontWeight:"700",letterSpacing:0.2}}>Muse</Text>
+                  <Text style={{color:t.ink,fontSize:19,fontWeight:"700",letterSpacing:0.2}}>Asteria</Text>
                   <Text style={{color:t.muted,fontSize:11}}>{tr("Personal assistant")}</Text>
                 </View>
               </View>
@@ -492,7 +492,7 @@ function Shell() {
                         {sorted.length === 1 ? tr("1 conversation") : tr("{count} conversations",{count:sorted.length})}
                       </Pill>
                     </View>
-                    <View pointerEvents="none" style={{position:"absolute",right:8,bottom:-12,opacity:0.13}}><MuseMark size={108} watermark /></View>
+                    <View pointerEvents="none" style={{position:"absolute",right:8,bottom:-12,opacity:0.13}}><AsteriaMark size={108} watermark /></View>
                   </>;
                 })()}
               </View>}
@@ -526,7 +526,7 @@ function Shell() {
             />
           ) : (
             <>
-              <PageHeader title={tr("Muse")} onOpenNavigation={showNavigation} />
+              <PageHeader title={tr("Asteria")} onOpenNavigation={showNavigation} />
               <View
                 style={{
                   flex: 1,
@@ -536,7 +536,7 @@ function Shell() {
                   gap: 18,
                 }}
               >
-                <MuseMark size={64} />
+                <AsteriaMark size={64} />
                 <Label large>
                   {tr(
                     classic

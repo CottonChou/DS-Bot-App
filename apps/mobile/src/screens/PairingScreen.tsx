@@ -10,7 +10,7 @@ import {
   Card,
   Field,
   Label,
-  MuseMark,
+  AsteriaMark,
   Notice,
   Sheet,
   styles,
@@ -138,9 +138,9 @@ export function PairingScreen({
       ]}
     >
       <View style={{ alignItems: "center", gap: spacing.md, paddingBottom: spacing.md }}>
-        <MuseMark size={64} />
+        <AsteriaMark size={64} />
         <Text style={{ ...typography.largeTitle, color: t.ink, letterSpacing: -0.3 }}>
-          Muse</Text>
+          Asteria</Text>
         <Text style={{ ...typography.subheadline, color: t.textSecondary }}>{tr("Your personal assistant, on your own server.")}</Text>
       </View>
       {Platform.OS === "web" && (

@@ -5,8 +5,8 @@ import { useColorScheme } from "react-native";
 
 // Base themes follow the host; mobile chat colors are shared across presets.
 export const THEMES = {
-  muse: {
-    name: "Muse",
+  asteria: {
+    name: "Asteria",
     light: [
       "#fafaf8",
       "#f3f3ef",
@@ -150,9 +150,9 @@ export function useTheme() {
     () => preferences,
   );
   const key =
-    typeof prefs.theme === "string" && Object.hasOwn(THEMES,prefs.theme)
+    typeof prefs.theme === "string" && Object.hasOwn(THEMES, prefs.theme)
       ? (prefs.theme as keyof typeof THEMES)
-      : "muse";
+      : "asteria";
   const [bg, sidebar, bubble, surface, ink, user, userText, baseAccent] =
     THEMES[key][dark ? "dark" : "light"];
   const accent =

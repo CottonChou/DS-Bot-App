@@ -21,7 +21,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path, Circle, Rect } from "react-native-svg";
 
-export function MuseMark({ size = 34, watermark = false }: { size?: number; watermark?: boolean }) {
+export function AsteriaMark({ size = 34, watermark = false }: { size?: number; watermark?: boolean }) {
   const t = useTheme();
   if (watermark) {
     return (

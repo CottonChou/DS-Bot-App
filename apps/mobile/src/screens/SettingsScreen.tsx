@@ -15,7 +15,7 @@ import {
   Icon,
   IconName,
   Label,
-  MuseMark,
+  AsteriaMark,
   Notice,
   PageHeader,
   Section,
@@ -67,7 +67,7 @@ const pages: {
   { id: "usage", title: "Usage", icon: "usage" },
   { id: "secrets", title: "Secrets", icon: "secrets" },
   { id: "feedback", title: "Feedback", icon: "feedback" },
-  { id: "about", title: "About Muse", icon: "feedback" },
+  { id: "about", title: "About Asteria", icon: "feedback" },
   { id: "updates", title: "Plugin updates", icon: "download" },
   { id: "harness", title: "Harness settings", icon: "settings" },
 ];
@@ -181,12 +181,12 @@ export function SettingsScreen({
           <>
             <View style={{backgroundColor:t.surface,borderRadius:radius.lg + 2,borderWidth:1,borderColor:t.line,overflow:"hidden"}}>
               <Pressable accessibilityRole="button" accessibilityLabel={tr("Connected host")} onPress={() => setPage("mobile")} style={{flexDirection:"row",alignItems:"center",gap:spacing.md + 2,minHeight:80,paddingHorizontal:spacing.lg + 4,paddingVertical:spacing.lg}}>
-                <MuseMark size={48} />
-                <View style={{flex:1,gap:3}}><Text numberOfLines={1} style={{...typography.title,fontSize:20,color:t.ink}}>{host.name || "Muse"}</Text><Text numberOfLines={1} style={{...typography.caption,color:t.textSecondary}}>{new URL(host.url).host}</Text></View><Icon name="chevron" color={t.faint}/>
+                <AsteriaMark size={48} />
+                <View style={{flex:1,gap:3}}><Text numberOfLines={1} style={{...typography.title,fontSize:20,color:t.ink}}>{host.name || "Asteria"}</Text><Text numberOfLines={1} style={{...typography.caption,color:t.textSecondary}}>{new URL(host.url).host}</Text></View><Icon name="chevron" color={t.faint}/>
               </Pressable>
               <SettingRow title={tr("Usage")} compact onPress={() => setPage("usage")} last/>
             </View>
-            <Section title={tr("Muse")}>
+            <Section title={tr("Asteria")}>
               <SettingRow title={tr("Needs you")} hint={tr("Memory, skills and tool approvals waiting for you.")} onPress={() => setPage("needs")}/>
               <SettingRow title={tr("Skills")} hint={tr("Prompt-lazy skills stored on this host.")} onPress={() => {setToolsChild(true);setPage("skills");}}/>
               <SettingRow title={tr("Tools & plugins")} hint={tr("Tools, plugins and capabilities")} onPress={() => setPage("tools")} last/>
@@ -202,13 +202,13 @@ export function SettingsScreen({
               <SettingRow title={tr("Appearance")} onPress={() => setPage("general")}/>
               <SettingRow title={tr("Language")} onPress={() => setPage("general")}/>
               <SettingRow title={tr("Plugin updates")} onPress={() => setPage("updates")}/>
-              <SettingRow title={tr("About Muse")} onPress={() => setPage("about")} last/>
+              <SettingRow title={tr("About Asteria")} onPress={() => setPage("about")} last/>
             </Section>
             <Section title={tr("Host")}>
               {pages.filter(item => ["connectors","secrets","feedback","harness"].includes(item.id)).map((item,index)=><SettingRow key={item.id} title={tr(item.title)} onPress={() => setPage(item.id as SettingsPage)} last={index===3}/>)}
             </Section>
             <Text style={{ textAlign: "center", fontSize: 12, color: t.faint }}>
-              {tr("Muse · Mobile")}</Text>
+              {tr("Asteria · Mobile")}</Text>
           </>
         )}
         {page === "needs" && <NeedsPanel client={client} online={online}/>}
@@ -258,7 +258,7 @@ export function SettingsScreen({
                         />
                       ))}
                     </View>
-                    {(team.prefs?.theme || "muse") === key && (
+                    {(team.prefs?.theme || "asteria") === key && (
                       <Tag>{tr("Selected")}</Tag>
                     )}
                   </SettingRow>
